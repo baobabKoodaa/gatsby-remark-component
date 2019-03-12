@@ -1,35 +1,30 @@
 const visit = require("unist-util-visit")
-import { html } from "./html-tags.js"
+import { htmlTagSet } from "./html-tags.js"
 
-module.exports = ({ markdownAST }, { components }) => {
-  if (!components || components.length == 0) {
-    setParentForNonHtmlElements(markdownAST)
-    return
-  }
-  if (components.length > 0) {
-    setParentForComponents(markdownAST, components)
-  }
+module.exports = function (_ref, _ref2) {
+  var markdownAST = _ref.markdownAST;
+  var components = new Set(_ref2.components || []); // Predefined components or empty set
+  var verbose = _ref2.verbose;
+  
+  if (verbose) console.log("Calling gatsby-remark-component-parent2div");
 
-  function setParentForComponents(markdownAST, components) {
-    components.forEach(comp => {
-      visit(markdownAST, `html`, (node, index, parent) => {
-        if (node.value == `<${comp}>`) {
-          console.log(`Setting type of ${comp} parent to div.`)
-          parent.type = "div"
-        }
-      })
-    })
+  // processTag decides if given input tag should be processed or not
+  function processTag(tag) {
+    if (components.size > 0) {
+      // If components are explicitly defined, only process those tags.
+      return components.has(tag)
+    }
+    // If components are not explicitly defined, process all non HTML tags.
+    return !htmlTagSet.has(tag)
   }
 
-  function setParentForNonHtmlElements(markdownAST) {
-    visit(markdownAST, "html", (node, index, parent) => {
-      if (
-        !html.some(
-          tag => node.value == `<${tag}>` || node.value.startsWith(`<${tag} `)
-        )
-      ) {
-        parent.type = "div"
-      }
-    })
-  }
+  visit(markdownAST, "html", function (node, index, parent) {
+    // node.value may be something like <my-component val=83 > or </my-component>
+    const tag = node.value.split(" ")[0].replace(/<|>|\//g, '')
+    if (processTag(tag)) {
+      parent.type = "div";
+      if (verbose) console.log("\nFound a custom tag " + tag);
+    }
+  });
+
 }

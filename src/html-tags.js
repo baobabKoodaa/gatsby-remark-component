@@ -1,4 +1,4 @@
-export const html = [
+export const htmlTagSet = new Set([
   "a",
   "abbr",
   "address",
@@ -117,4 +117,4 @@ export const html = [
   "var",
   "video",
   "wbr"
-]
+])
