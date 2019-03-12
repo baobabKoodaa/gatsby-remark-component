@@ -1,7 +1,7 @@
 {
   "name": "gatsby-remark-component-parent2div",
   "description": "When you use a React component in your Markdown, you may need this package to change the parent element to div to avoid incorrect nesting.",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "author": "Baobab Koodaa <npm931823452@baobab.fi>",
   "main": "lib.js",
   "files": [

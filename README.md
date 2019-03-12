@@ -1,17 +1,31 @@
-# Gatsby Remark Component [![Build Status](https://travis-ci.org/Hebilicious/gatsby-remark-component.svg?branch=master)](https://travis-ci.org/Hebilicious/gatsby-remark-component) [![npm version](https://badge.fury.io/js/gatsby-remark-component.svg)](https://badge.fury.io/js/gatsby-remark-component)
+# gatsby-remark-component-parent2div
 
-A gatsby-transformer-remark plugin that change the AST node parent of a custom component to a div.
-
-> * [Gatsby](https://www.gatsbyjs.org/)
-> * [gatsby-transformer-remark](https://www.gatsbyjs.org/packages/gatsby-transformer-remark/)
+This is a plugin for [gatsby-transformer-remark](https://www.gatsbyjs.org/packages/gatsby-transformer-remark/).
+You may need this plugin if you are seeing a `validateDOMNesting` warning in console.
+This warning may come up if you are
+[embedding custom React Components inside your Markdown files](https://using-remark.gatsbyjs.org/custom-components/).
+If your Component has any div elements, then you end up nesting `<div>` inside `<p>`, which is against HTML specification.
+Modern browsers will take a guess at what you want and render something (usually reasonable), but it's not guaranteed,
+so you should fix the warning. You can fix this in 2 ways: either you change your component so that it doesn't have
+a `<div>` or you can use this plugin to change the AST node parent of your custom component from `<p>` to `<div>`.
 
 ## Install
 
+You can install with `npm` or `yarn`.
+
 ```bash
-yarn add gatsby-transformer-remark gatsby-remark-component
+yarn add gatsby-transformer-remark gatsby-remark-component-parent2div
+npm i gatsby-remark-component-parent2div
 ```
 
 ## Release Notes
+
+> v 1.2
+
+* Fixed bug where Component is not detected when passing props (and auto-detection is off).
+* Fixed tests.
+* Improved time complexity from O(nch) to O(n), where n=nodesInMarkdown, c=componentsSpecifiedInOptions, h=htmlTagsSpecifiedInCode
+* Added a `verbose` option for console logs.
 
 > v 1.1
 
@@ -20,9 +34,7 @@ yarn add gatsby-transformer-remark gatsby-remark-component
 
 ## How to use
 
-> Read the great custom component article on the official gatsby remark blog [here](https://using-remark.gatsbyjs.org/custom-components/).
-
-This is the base settings, your components inside your markdown will be auto-detected.
+Minimal configuration, auto-detect custom components:
 
 ```js
 //In your gatsby-config.js ...
@@ -30,14 +42,13 @@ plugins: [
   {
     resolve: "gatsby-transformer-remark",
     options: {
-      plugins: ["gatsby-remark-component"]
+      plugins: ["gatsby-remark-component-parent2div"]
     }
   }
 ]
 ```
 
-You can explicitly declare the name of the components if you want to be strict. (it will disable the auto-detection
-)
+Disable auto-detection (if you want only some custom components' parents changed, but not others).
 
 ```js
 plugins: [
@@ -46,8 +57,11 @@ plugins: [
     options: {
       plugins: [
         {
-          resolve: "gatsby-remark-component",
-          options: { components: ["my-component", "other-component"] }
+          resolve: "gatsby-remark-component-parent2div",
+          options: {
+            components: ["my-component", "other-component"],
+            verbose: true
+          }
         }
       ]
     }
@@ -143,3 +157,13 @@ Some text
 ```
 
 This will render your component without any validateDOMNesting warning.
+
+## Attribution
+
+Hi, I'm Baobab. This project was created by [Hebilicious](https://github.com/Hebilicious/). It was not maintained anymore, so I decided to fork it. You are now looking at the fork. The original is [here](https://github.com/Hebilicious/gatsby-remark-component).
+
+Authors:
+- [Hebilicious](https://github.com/Hebilicious/)
+- [Baobab Koodaa](https://github.com/baobabKoodaa/)
+- [Designbyadrian](https://github.com/designbyadrian)
+- [rstacruz](https://github.com/rstacruz)
